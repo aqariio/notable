@@ -1,46 +1,27 @@
 import './MainMenu.css';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.SENDER_ID,
-  appId: process.env.APP_ID
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { Box } from "@mui/joy";
 
 function MainMenu() {
-  const addData = async () => {
-    try {
-      const docRef = await addDoc(collection(db, "newcollection"), {
-        field: "amongus"
-      });
-      console.log("Document written with ID: ", docRef.id);
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src="logo.svg" className="App-logo" alt="logo" />
-        <p>
-          I sure love learning react
-        </p>
-        <button
-          className="App-link"
-          onClick={addData}
-        >
-          Add Data Among Us
-        </button>
-      </header>
-    </div>
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          justifyItems: "center",
+        }}
+        className="homeTextContainer"
+      >
+        <h1 className="title">
+          Welcome to Notable
+        </h1>
+        <h1 className="description">
+          You can add tasks, set reminders <br /> and take notes, all in one place!
+        </h1>
+        <img src="logo.svg" className="logo" />
+      </Box>
+    </>
   );
 }
 
