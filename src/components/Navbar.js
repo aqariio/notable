@@ -29,7 +29,7 @@ const Navbar = () => {
             alignItems: "center",
           }}
         >
-          <Link to="/" className="homeButton" sx={{ marginBottom: "0" }}>
+          <Link to="/" className="homeButton">
             Notable
           </Link>
         </Box>
@@ -40,29 +40,18 @@ const Navbar = () => {
             alignItems: "center",
             gap: "7vh",
             mr: "2vh",
+            marginBottom: "0",
           }}
         >
-        <Link
-          to="/tasks"
-          className="smallButton"
-          sx={{ marginBottom: "0" }}
-        >
-          Tasks
-        </Link>
-        <Link
-          to="/notebook"
-          className="smallButton"
-          sx={{ marginBottom: "0" }}
-        >
-          Notebook
-        </Link>
-        <Link
-          to="/account"
-          className="smallButton"
-          sx={{ marginBottom: "0" }}
-        >
-          acc
-        </Link>
+          <Link to="/tasks" className="smallButton">
+            Tasks
+          </Link>
+          <Link to="/notebook" className="smallButton">
+            Notebook
+          </Link>
+          <Link to="/account" className="smallButton">
+            acc
+          </Link>
         </Box>
       </Box>
     </Box>
