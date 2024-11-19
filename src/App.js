@@ -4,12 +4,18 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  // apiKey: process.env.API_KEY,
+  // authDomain: process.env.AUTH_DOMAIN,
+  // projectId: process.env.PROJECT_ID,
+  // storageBucket: process.env.STORAGE_BUCKET,
+  // messagingSenderId: process.env.SENDER_ID,
+  // appId: process.env.APP_ID
+  apiKey: "AIzaSyAjzwfnycL-s4HAZopwD9tJSH72q-4POE0",
+  authDomain: "notable-max.firebaseapp.com",
+  projectId: "notable-max",
+  storageBucket: "notable-max.firebasestorage.app",
+  messagingSenderId: "916202186075",
+  appId: "1:916202186075:web:870f31559bb5e2e5eae67e"
 };
 
 // Initialize Firebase
