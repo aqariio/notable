@@ -9,7 +9,11 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: App-logo-spin infinite 0.5s linear;
+    /* animation: App-link-bounce infinite alternate 1s ease-in; */
+  }
+  .App-link {
+    animation: App-link-bounce infinite alternate 1s ease-in;
   }
 }
 
@@ -25,7 +29,14 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color: #ffffff;
+  background-color: #4cae0a;
+  padding: 10px 20px;
+  border-radius: 100vh;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.0rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 @keyframes App-logo-spin {
@@ -36,3 +47,14 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes App-link-bounce {
+  from {
+    transform: translate(0);
+  }
+  to {
+    transform: translate(0px, 10px);
+  }
+}
+
+
