@@ -8,13 +8,12 @@ const App = () => {
   return (
     <>
       <Router>
+      <Navbar />
         <Routes>
           <Route path="/" element={<MainMenu />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/notebook" element={<Notebook />} />
-          {/* <Route path="/account" element={<MainMenu />} /> */}
         </Routes>
-        <Navbar />
       </Router>
     </>
   );
