@@ -48,7 +48,7 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="sticky" color="primary" className="navbar">
+    <AppBar position="fixed" color="primary" className="navbar">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -112,6 +112,9 @@ const Navbar = () => {
               ))}
             </Menu>
           </Box>
+
+          {/* large */}
+
           <Typography
             className="homeButton"
             variant="h6"
@@ -133,15 +136,7 @@ const Navbar = () => {
             </Link>
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, mx: 1.2, color: "black", display: "block" }}
-              >
-                {page}
-              </Button>
-            ))}
+            {pages.map((page) => page)}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Account">
