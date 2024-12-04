@@ -26,7 +26,7 @@ const pages = [
     Notebook
   </Link>,
 ];
-const settings = ["Logout"];
+const settings = [<a class="smallButton">Logout</a>];
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -71,6 +71,8 @@ const Navbar = () => {
             </Link>
           </Typography>
 
+          {/* small */}
+
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -96,11 +98,16 @@ const Navbar = () => {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: "block", md: "none" } }}
+              sx={{
+                display: { xs: "block", md: "none" },
+                "& .MuiMenu-paper": { backgroundColor: "#202020" },
+              }}
             >
               {pages.map((page) => (
-                <MenuItem className="smallButton" onClick={handleCloseNavMenu}>
-                  <Typography className="smallButton" textAlign="center">{page}</Typography>
+                <MenuItem className="menu" onClick={handleCloseNavMenu}>
+                  <Typography className="smallButton" textAlign="center">
+                    {page}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -130,7 +137,7 @@ const Navbar = () => {
               <Button
                 key={page}
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, mx: 1.2, color: "white", display: "block" }}
+                sx={{ my: 2, mx: 1.2, color: "black", display: "block" }}
               >
                 {page}
               </Button>
@@ -143,7 +150,10 @@ const Navbar = () => {
               </IconButton>
             </Tooltip>
             <Menu
-              sx={{ mt: "45px" }}
+              sx={{
+                mt: "45px",
+                "& .MuiMenu-paper": { backgroundColor: "#202020" },
+              }}
               id="menu-appbar"
               anchorEl={anchorElUser}
               anchorOrigin={{
@@ -159,7 +169,11 @@ const Navbar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem
+                  className="menu"
+                  key={setting}
+                  onClick={handleCloseUserMenu}
+                >
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>

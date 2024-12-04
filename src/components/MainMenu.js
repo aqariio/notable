@@ -17,9 +17,9 @@ function MainMenu() {
           Welcome to Notable
         </h1>
         <h1 className="description">
-          You can add tasks, set reminders <br /> and take notes, all in one place!
+          You can add tasks, set reminders and take notes, all in one place!
         </h1>
-        <img src="logo.svg" className="logo" />
+        {/* <img src="logo.svg" className="logo" /> */}
       </Box>
     </>
   );

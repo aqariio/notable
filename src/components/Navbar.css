@@ -4,10 +4,8 @@
 .navbar {
   background-color: #202020 !important;
   border: transparent;
-  border-radius: 0;
-  border-width: 0px;
   border-bottom: #2B2B2B;
-  border-bottom-width: 2px;
+  border-bottom-width: 0.2vmin;
   border-style: solid;
 }
 
@@ -31,4 +29,8 @@
   color: #e6e6e6;
   text-decoration: none !important;
   text-transform: none;
+}
+
+.menu {
+  background-color: #202020 !important;
 }
