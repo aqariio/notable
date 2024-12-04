@@ -7,7 +7,7 @@
 
 .header {
   font-family: "Inter", sans-serif;
-  font-weight: 800;
+  font-weight: 700;
   font-style: normal;
   font-size: calc(12px + 2.5vmin);
   color: #d0d0d0;
@@ -16,11 +16,11 @@
   background-color: #191919;
   position: relative;
   margin-top: 15vh;
-  margin-left: 30%;
+  margin-left: 25%;
 }
 
 .doc {
-  width: calc(100% - 2 * 30%);
+  width: calc(100% - 2 * 25%);
   height: 600vh;
   position: relative;
   margin-top: 0vh;
@@ -35,7 +35,7 @@
   background-color: #191919;
   font-family: "Inter", sans-serif;
   overflow: visible;
-  padding: 30%;
+  padding: 25%;
   padding-top: 2%;
   border: transparent;
   border-radius: 0px;

@@ -1,6 +1,7 @@
-import './Tasks.css';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import "./Tasks.css";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { Box } from "@mui/joy";
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -8,7 +9,7 @@ const firebaseConfig = {
   projectId: process.env.PROJECT_ID,
   storageBucket: process.env.STORAGE_BUCKET,
   messagingSenderId: process.env.SENDER_ID,
-  appId: process.env.APP_ID
+  appId: process.env.APP_ID,
 };
 
 // Initialize Firebase
@@ -19,7 +20,7 @@ function Tasks() {
   const addData = async () => {
     try {
       const docRef = await addDoc(collection(db, "newcollection"), {
-        field: "amongus"
+        field: "amongus",
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -27,20 +28,20 @@ function Tasks() {
     }
   };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src="logo.svg" className="App-logo" alt="logo" />
-        <p>
-          Tasks
-        </p>
-        <button
-          className="App-link"
-          onClick={addData}
-        >
-          Get Tasks
-        </button>
-      </header>
-    </div>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        justifyItems: "center",
+      }}
+      className="homeTextContainer"
+    >
+      <h1 className="title">Tasks</h1>
+      <button className="button" onClick={addData}>
+        Get Tasks
+      </button>
+    </Box>
   );
 }
 
