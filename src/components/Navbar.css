@@ -25,11 +25,11 @@
 .smallButton {
   font-family: "Inter", sans-serif;
   font-weight: 400;
-  font-size: 1.8vmin;
+  font-size: 85%;
   font-style: normal;
   color: #e6e6e6;
-  margin-left: 1.6vw;
-  margin-right: 1.6vw;
+  margin-left: 1.6%;
+  margin-right: 1.6%;
   text-decoration: none !important;
   text-transform: none;
 }
