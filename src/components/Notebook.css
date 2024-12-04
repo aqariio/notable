@@ -16,12 +16,12 @@
   background-color: #191919;
   position: relative;
   margin-top: 15vh;
-  margin-left: 25%;
+  margin-left: calc(2px + 22vw);
 }
 
 .doc {
-  width: calc(100% - 2 * 25%);
-  height: 600vh;
+  width: calc(100% - 2 * calc(2px + 22vw));
+  height: 35vh;
   position: relative;
   margin-top: 0vh;
   flex-direction: column;
@@ -34,8 +34,8 @@
   margin-right: auto;
   background-color: #191919;
   font-family: "Inter", sans-serif;
-  overflow: visible;
-  padding: 25%;
+  overflow: hidden;
+  padding: calc(2px + 22vw);
   padding-top: 2%;
   border: transparent;
   border-radius: 0px;
