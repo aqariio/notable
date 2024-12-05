@@ -12,8 +12,8 @@ import Typography from "@mui/material/Typography";
 
 const card = (title, desc, status) => (
   <React.Fragment>
-    <CardContent>
-      <Typography className={styles.title} variant="h6" component="div">
+    <CardContent className={styles.tasks}>
+      <Typography className={styles.title}>
         {title}
       </Typography>
       <Typography className={styles.description}>
@@ -72,12 +72,21 @@ function Tasks() {
             {/* <Box className={styles.title}>{task.title}</Box>
             <Box className={styles.description}>{task.description + " | "}{parseStatus(task.status)}</Box> */}
             <Card
+              className={styles.card}
               sx={{
                 backgroundColor: "#202020",
                 borderColor: "#2B2B2B",
+                borderWidth: 1.9,
                 color: "#ffffff",
+                maxWidth: 600,
+                minWidth: 600,
+                maxHeight: 100,
+                borderRadius: 10,
+                boxShadow: 5,
+                textAlign: "left"
               }}
               variant="outlined"
+              raised={true}
             >
               {card(task.title, task.description, parseStatus(task.status))}
             </Card>
