@@ -1,12 +1,12 @@
-import "./Notebook.css";
+import styles from "./Notebook.module.css";
 
 function Notebook() {
   return (
-    <div className="notebook">
-      <header className="header">
+    <div className={styles.notebook}>
+      <header className={styles.header}>
         <p>Notebook</p>
       </header>
-      <textarea id="doc" className="doc" type="text" onInput={resize}/>
+      <textarea id="doc" className={styles.doc} type="text" onInput={resize}/>
     </div>
   );
 }

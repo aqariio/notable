@@ -16,17 +16,17 @@ import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
 import { Link } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import "./Navbar.css";
+import styles from "./Navbar.module.css";
 
 const pages = [
-  <Link to="/tasks" class="smallButton">
+  <Link to="/tasks" class={styles.smallButton}>
     Tasks
   </Link>,
-  <Link to="/notebook" class="smallButton">
+  <Link to="/notebook" class={styles.smallButton}>
     Notebook
   </Link>,
 ];
-const settings = [<a class="smallButton">Logout</a>];
+const settings = [<a class={styles.smallButton}>Logout</a>];
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -48,11 +48,11 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="fixed" color="primary" className="navbar">
+    <AppBar position="fixed" color="primary" className={styles.navbar}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
-            className="homeButton"
+            className={styles.homeButton}
             variant="h6"
             noWrap
             component="a"
@@ -66,7 +66,7 @@ const Navbar = () => {
               textDecoration: "none",
             }}
           >
-            <Link to="/" class="homeButton">
+            <Link to="/" class={styles.homeButton}>
               Notable
             </Link>
           </Typography>
@@ -105,7 +105,7 @@ const Navbar = () => {
             >
               {pages.map((page) => (
                 <MenuItem className="menu" onClick={handleCloseNavMenu}>
-                  <Typography className="smallButton" textAlign="center">
+                  <Typography className={styles.smallButton} textAlign="center">
                     {page}
                   </Typography>
                 </MenuItem>
@@ -116,7 +116,7 @@ const Navbar = () => {
           {/* large */}
 
           <Typography
-            className="homeButton"
+            className={styles.homeButton}
             variant="h6"
             noWrap
             component="a"
@@ -131,7 +131,7 @@ const Navbar = () => {
               textDecoration: "none",
             }}
           >
-            <Link to="/" class="homeButton">
+            <Link to="/" class={styles.homeButton}>
               Notable
             </Link>
           </Typography>

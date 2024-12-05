@@ -1,8 +1,27 @@
-import "./Tasks.css";
+import styles from "./Tasks.module.css";
+import * as React from "react";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "./Firebase";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+
+const card = (title, desc, status) => (
+  <React.Fragment>
+    <CardContent>
+      <Typography className={styles.title} variant="h6" component="div">
+        {title}
+      </Typography>
+      <Typography className={styles.description}>
+        {desc + " | " + status}
+      </Typography>
+    </CardContent>
+  </React.Fragment>
+);
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
@@ -26,7 +45,6 @@ function Tasks() {
       querySnapshot.forEach((doc) => {
         tasksArray.push({ id: doc.id, ...doc.data() });
       });
-      console.log("Fetched tasks: ", tasksArray); // Debugging statement
       setTasks(tasksArray);
     } catch (e) {
       console.error("Error getting documents: ", e);
@@ -35,6 +53,7 @@ function Tasks() {
 
   useEffect(() => {
     getData();
+    console.log("tasks", tasks);
   }, []);
 
   return (
@@ -42,24 +61,30 @@ function Tasks() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         justifyItems: "center",
       }}
-      className="homeTextContainer"
+      className={styles.homeTextContainer}
     >
-      <h1 className="title">Tasks</h1>
-      <Box className="tasks">
-        <p className="task">
-          {tasks.map((task) => (
-            <a key={task.id}>
-              {task.title + " | "}
-              {task.description + " | "}
-              {parseStatus(task.status)}
-            </a>
-          ))}
-        </p>
+      <h1 className={styles.header}>Tasks</h1>
+      <Box className={styles.tasks}>
+        {tasks.map((task) => (
+          <Box key={task.id}>
+            {/* <Box className={styles.title}>{task.title}</Box>
+            <Box className={styles.description}>{task.description + " | "}{parseStatus(task.status)}</Box> */}
+            <Card
+              sx={{
+                backgroundColor: "#202020",
+                borderColor: "#2B2B2B",
+                color: "#ffffff",
+              }}
+              variant="outlined"
+            >
+              {card(task.title, task.description, parseStatus(task.status))}
+            </Card>
+          </Box>
+        ))}
       </Box>
-      <button className="button" onClick={addData}>
+      <button className={styles.button} onClick={addData}>
         +
       </button>
     </Box>
