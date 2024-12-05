@@ -1,32 +1,42 @@
 import "./Tasks.css";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
-import { Box } from "@mui/joy";
-
-const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: process.env.AUTH_DOMAIN,
-  projectId: process.env.PROJECT_ID,
-  storageBucket: process.env.STORAGE_BUCKET,
-  messagingSenderId: process.env.SENDER_ID,
-  appId: process.env.APP_ID,
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import { db } from "./Firebase";
+import Box from "@mui/material/Box";
+import { useEffect, useState } from "react";
 
 function Tasks() {
+  const [tasks, setTasks] = useState([]);
+
   const addData = async () => {
     try {
-      const docRef = await addDoc(collection(db, "newcollection"), {
-        field: "amongus",
+      const docRef = await addDoc(collection(db, "tasks"), {
+        title: "homework",
+        description: "do homework",
+        status: 50,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   };
+  const getData = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "tasks"));
+      const tasksArray = [];
+      querySnapshot.forEach((doc) => {
+        tasksArray.push({ id: doc.id, ...doc.data() });
+      });
+      console.log("Fetched tasks: ", tasksArray); // Debugging statement
+      setTasks(tasksArray);
+    } catch (e) {
+      console.error("Error getting documents: ", e);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <Box
       sx={{
@@ -38,11 +48,26 @@ function Tasks() {
       className="homeTextContainer"
     >
       <h1 className="title">Tasks</h1>
+      <Box className="tasks">
+        <p className="task">
+          {tasks.map((task) => (
+            <a key={task.id}>
+              {task.title + " | "}
+              {task.description + " | "}
+              {parseStatus(task.status)}
+            </a>
+          ))}
+        </p>
+      </Box>
       <button className="button" onClick={addData}>
-        Get Tasks
+        +
       </button>
     </Box>
   );
+}
+
+function parseStatus(status) {
+  return Math.min(Math.max(0, status), 100) + "% complete";
 }
 
 export default Tasks;
