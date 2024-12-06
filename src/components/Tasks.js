@@ -76,6 +76,7 @@ function TaskDialog(props) {
     handleClose,
     open,
     addData,
+    id,
     title,
     description,
     status,
@@ -105,7 +106,7 @@ function TaskDialog(props) {
           const title = formJson.title;
           const description = formJson.description;
           const status = formJson.status;
-          addData(title, description, parseInt(status));
+          addData(id, title, description, parseInt(status));
           handleClose();
         },
       }}
@@ -279,6 +280,7 @@ TaskDialog.propTypes = {
   handleClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   addData: PropTypes.func.isRequired,
+  id: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   status: PropTypes.number,
@@ -308,7 +310,12 @@ export default function Tasks() {
   };
 
   const handleCloseEdit = () => {
-    setCurrentTask({ id: null, title: "", description: "", status: "" });
+    setCurrentTask({
+      id: null,
+      title: "",
+      description: "",
+      status: "",
+    });
   };
 
   const [tasks, setTasks] = useState([]);
@@ -327,7 +334,7 @@ export default function Tasks() {
     }
   };
 
-  const addData = async (title, description, status) => {
+  const addData = async (id, title, description, status) => {
     try {
       const docRef = await addDoc(collection(db, "tasks"), {
         title: title,
@@ -398,6 +405,7 @@ export default function Tasks() {
       <TaskDialog
         header="Edit task"
         confirmButton="Save"
+        id={currentTask.id}
         title={currentTask.title}
         description={currentTask.description}
         status={currentTask.status}
