@@ -7,6 +7,7 @@ import {
   getDocs,
   doc,
   updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "./Firebase";
 import Box from "@mui/material/Box";
@@ -14,7 +15,6 @@ import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -22,7 +22,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import TextField from "@mui/material/TextField";
 
 function parseStatus(status) {
@@ -73,14 +72,20 @@ function TaskDialog(props) {
   const {
     header,
     confirmButton,
-    handleClose,
     open,
+    handleClose,
+    deleteData,
     addData,
     id,
     title,
     description,
     status,
   } = props;
+
+  const handleDelete = (id) => {
+    deleteData(id);
+    handleClose();
+  }
 
   return (
     <Dialog
@@ -246,29 +251,49 @@ function TaskDialog(props) {
           variant="outlined"
         />
       </DialogContent>
-      <DialogActions>
-        <Button
-          sx={{
-            textTransform: "none",
-            color: "#aaaaaa",
-            fontFamily: '"Inter", sans-serif',
-            fontWeight: 600,
-          }}
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
-        <Button
-          sx={{
-            textTransform: "none",
-            color: "#5798f7",
-            fontFamily: '"Inter", sans-serif',
-            fontWeight: 600,
-          }}
-          type="submit"
-        >
-          {confirmButton}
-        </Button>
+      <DialogActions
+        sx={{
+          justifyContent: handleDelete ? "space-between" : "flex-end",
+        }}
+      >
+        {handleDelete && (
+          <Button
+            sx={{
+              textTransform: "none",
+              color: "#dd5050",
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 600,
+              alignSelf: "flex-start !important",
+            }}
+            onClick={handleDelete}
+          >
+            Delete
+          </Button>
+        )}
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            sx={{
+              textTransform: "none",
+              color: "#aaaaaa",
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 600,
+            }}
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            sx={{
+              textTransform: "none",
+              color: "#5798f7",
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 600,
+            }}
+            type="submit"
+          >
+            {confirmButton}
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );
@@ -278,6 +303,7 @@ TaskDialog.propTypes = {
   header: PropTypes.string.isRequired,
   confirmButton: PropTypes.string.isRequired,
   handleClose: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   addData: PropTypes.func.isRequired,
   id: PropTypes.string,
@@ -320,20 +346,6 @@ export default function Tasks() {
 
   const [tasks, setTasks] = useState([]);
 
-  const editData = async (id, title, description, status) => {
-    try {
-      const taskDoc = doc(db, "tasks", id);
-      await updateDoc(taskDoc, {
-        title: title,
-        description: description,
-        status: status,
-      });
-      console.log("Document updated with ID: ", id);
-    } catch (e) {
-      console.error("Error updating document: ", e);
-    }
-  };
-
   const addData = async (id, title, description, status) => {
     try {
       const docRef = await addDoc(collection(db, "tasks"), {
@@ -341,6 +353,7 @@ export default function Tasks() {
         description: description,
         status: status,
       });
+      getData();
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -357,6 +370,31 @@ export default function Tasks() {
       setTasks(tasksArray);
     } catch (e) {
       console.error("Error getting documents: ", e);
+    }
+  };
+
+  const editData = async (id, title, description, status) => {
+    try {
+      const taskDoc = doc(db, "tasks", id);
+      await updateDoc(taskDoc, {
+        title: title,
+        description: description,
+        status: status,
+      });
+      getData();
+      console.log("Document updated with ID: ", id);
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  };
+
+  const deleteData = async (id) => {
+    try {
+      await deleteDoc(doc(db, "tasks", id));
+      console.log("Document deleted with ID: ", id);
+      getData();
+    } catch (e) {
+      console.error("Error deleting document: ", e);
     }
   };
 
@@ -411,6 +449,7 @@ export default function Tasks() {
         status={currentTask.status}
         open={currentTask.id !== null}
         handleClose={handleCloseEdit}
+        deleteData={() => deleteData(currentTask.id)}
         addData={editData}
       />
     </Box>
