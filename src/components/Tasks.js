@@ -3,6 +3,8 @@ import * as React from "react";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "./Firebase";
 import Box from "@mui/material/Box";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -13,9 +15,7 @@ import Typography from "@mui/material/Typography";
 const card = (title, desc, status) => (
   <React.Fragment>
     <CardContent className={styles.tasks}>
-      <Typography className={styles.title}>
-        {title}
-      </Typography>
+      <Typography className={styles.title}>{title}</Typography>
       <Typography className={styles.description}>
         {desc + " | " + status}
       </Typography>
@@ -29,9 +29,9 @@ function Tasks() {
   const addData = async () => {
     try {
       const docRef = await addDoc(collection(db, "tasks"), {
-        title: "homework",
-        description: "do homework",
-        status: 50,
+        title: "amongus",
+        description: "bottom text",
+        status: 69,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -69,8 +69,6 @@ function Tasks() {
       <Box className={styles.tasks}>
         {tasks.map((task) => (
           <Box key={task.id}>
-            {/* <Box className={styles.title}>{task.title}</Box>
-            <Box className={styles.description}>{task.description + " | "}{parseStatus(task.status)}</Box> */}
             <Card
               className={styles.card}
               sx={{
@@ -83,7 +81,7 @@ function Tasks() {
                 maxHeight: 100,
                 borderRadius: 10,
                 boxShadow: 5,
-                textAlign: "left"
+                textAlign: "left",
               }}
               variant="outlined"
               raised={true}
@@ -93,9 +91,15 @@ function Tasks() {
           </Box>
         ))}
       </Box>
-      <button className={styles.button} onClick={addData}>
-        +
-      </button>
+      <Box sx={{ marginBottom: 20 }} />
+      <Fab
+        className={styles.button}
+        color="primary"
+        aria-label="add-task"
+        onClick={addData}
+      >
+        <AddIcon />
+      </Fab>
     </Box>
   );
 }
