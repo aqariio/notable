@@ -1,5 +1,6 @@
 import styles from "./Tasks.module.css";
 import * as React from "react";
+import PropTypes from "prop-types";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "./Firebase";
 import Box from "@mui/material/Box";
@@ -11,6 +12,16 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import TextField from "@mui/material/TextField";
+
+function parseStatus(status) {
+  return Math.min(Math.max(0, status), 100) + "% complete";
+}
 
 const card = (title, desc, status) => (
   <React.Fragment>
@@ -23,7 +34,209 @@ const card = (title, desc, status) => (
   </React.Fragment>
 );
 
-function Tasks() {
+function TaskDialog(props) {
+  const { onClose, open } = props;
+
+  const handleClose = () => {
+    onClose();
+  };
+
+  return (
+    <Dialog
+      sx={{
+        "& .MuiDialog-paper": {
+          backgroundColor: "#191919",
+          color: "#ffffff",
+          borderRadius: 5,
+          width: 600,
+          borderWidth: "0.2vmin",
+          borderColor: "#2B2B2B",
+          borderStyle: "solid",
+        },
+      }}
+      onClose={handleClose}
+      open={open}
+      PaperProps={{
+        component: "form",
+        onSubmit: (event) => {
+          event.preventDefault();
+          const formData = new FormData(event.currentTarget);
+          const formJson = Object.fromEntries(formData.entries());
+          const email = formJson.email;
+          console.log(email);
+          handleClose();
+        },
+      }}
+    >
+      <DialogTitle className={styles.dialogTitle}>Add new task</DialogTitle>
+      <DialogContent>
+        <TextField
+          sx={{
+            borderRadius: "50px",
+            boxShadow: 5,
+            backgroundColor: "#202020",
+            "& .MuiInputBase-input": {
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              color: "#aaaaaa",
+            },
+            "& .MuiInputLabel-root": {
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              color: "#aaaaaa",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#2B2B2B",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+              "&:hover fieldset": {
+                borderColor: "#404040",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#505050",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+            },
+          }}
+          autoFocus
+          required
+          margin="dense"
+          id="title"
+          name="title"
+          label="Title"
+          type="title"
+          fullWidth
+          variant="outlined"
+        />
+        <TextField
+          sx={{
+            borderRadius: "50px",
+            boxShadow: 5,
+            backgroundColor: "#202020",
+            "& .MuiInputBase-input": {
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              color: "#aaaaaa",
+            },
+            "& .MuiInputLabel-root": {
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              color: "#aaaaaa",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#2B2B2B",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+              "&:hover fieldset": {
+                borderColor: "#404040",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#505050",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+            },
+          }}
+          margin="dense"
+          id="description"
+          name="description"
+          label="Description"
+          type="descripotion"
+          fullWidth
+          variant="outlined"
+        />
+        <TextField
+          sx={{
+            borderRadius: "50px",
+            boxShadow: 5,
+            backgroundColor: "#202020",
+            "& .MuiInputBase-input": {
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              color: "#aaaaaa",
+            },
+            "& .MuiInputLabel-root": {
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              color: "#aaaaaa",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "#2B2B2B",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+              "&:hover fieldset": {
+                borderColor: "#404040",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#505050",
+                borderWidth: "2px",
+                borderRadius: "50px",
+              },
+            },
+          }}
+          required
+          margin="dense"
+          id="status"
+          name="status"
+          label="Status"
+          type="status"
+          fullWidth
+          variant="outlined"
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button
+          sx={{
+            textTransform: "none",
+            color: "#aaaaaa",
+          }}
+          onClick={handleClose}
+        >
+          Cancel
+        </Button>
+        <Button
+          sx={{
+            textTransform: "none",
+          }}
+          type="submit"
+        >
+          Create
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+TaskDialog.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+};
+
+export default function Tasks() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    console.log("handle click");
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   const [tasks, setTasks] = useState([]);
 
   const addData = async () => {
@@ -38,6 +251,7 @@ function Tasks() {
       console.error("Error adding document: ", e);
     }
   };
+
   const getData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, "tasks"));
@@ -65,7 +279,7 @@ function Tasks() {
       }}
       className={styles.homeTextContainer}
     >
-      <h1 className={styles.header}>Tasks</h1>
+      <Typography className={styles.header}>Tasks</Typography>
       <Box className={styles.tasks}>
         {tasks.map((task) => (
           <Box key={task.id}>
@@ -96,16 +310,11 @@ function Tasks() {
         className={styles.button}
         color="primary"
         aria-label="add-task"
-        onClick={addData}
+        onClick={handleClickOpen}
       >
         <AddIcon />
       </Fab>
+      <TaskDialog open={open} onClose={handleClose} />
     </Box>
   );
 }
-
-function parseStatus(status) {
-  return Math.min(Math.max(0, status), 100) + "% complete";
-}
-
-export default Tasks;

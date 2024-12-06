@@ -7,19 +7,36 @@
   }
 }
 
-.header {
+.dialogTitle {
   font-family: "Inter", sans-serif !important;
   min-height: 0vh;
-  font-weight: 600;
+  font-weight: 600 !important;
   font-style: normal;
   margin-left: 0 !important;
-  margin-top: 12vh !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: #ffffff;
+  font-size: calc(5px + 1.7vmin) !important;
+  color: #cccccc !important;
+}
+
+.header {
+  font-family: "Inter", sans-serif !important;
+  min-height: 0vh;
+  font-weight: 600 !important;
+  font-style: normal;
+  margin-left: 0 !important;
+  margin-top: 15vh !important;
+  margin-bottom: 4vh !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin) !important;
+  color: #ffffff !important;
 }
 
 .card {
@@ -33,7 +50,7 @@
   min-height: 0vh;
   font-weight: 600;
   padding-top: 6px !important;
-  padding-bottom: 10px !important;
+  padding-bottom: 6px !important;
   padding-left: 40px !important;
   padding-right: 40px !important;
   font-style: normal;
