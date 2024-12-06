@@ -253,10 +253,10 @@ function TaskDialog(props) {
       </DialogContent>
       <DialogActions
         sx={{
-          justifyContent: handleDelete ? "space-between" : "flex-end",
+          justifyContent: deleteData ? "space-between" : "flex-end",
         }}
       >
-        {handleDelete && (
+        {deleteData && (
           <Button
             sx={{
               textTransform: "none",
@@ -330,9 +330,7 @@ export default function Tasks() {
   };
 
   const handleOpenEdit = (task) => {
-    console.log("task", task);
     setCurrentTask(task);
-    console.log("current task", currentTask);
   };
 
   const handleCloseEdit = () => {
