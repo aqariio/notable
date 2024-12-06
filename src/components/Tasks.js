@@ -1,7 +1,13 @@
 import styles from "./Tasks.module.css";
 import * as React from "react";
 import PropTypes from "prop-types";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "./Firebase";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
@@ -23,23 +29,57 @@ function parseStatus(status) {
   return Math.min(Math.max(0, status), 100) + "% complete";
 }
 
-const card = (title, desc, status) => (
-  <React.Fragment>
-    <CardContent className={styles.tasks}>
-      <Typography className={styles.title}>{title}</Typography>
-      <Typography className={styles.description}>
-        {desc + " | " + status}
-      </Typography>
-    </CardContent>
-  </React.Fragment>
-);
+function TaskCard(props) {
+  const { title, desc, status, handleOpen } = props;
+
+  return (
+    <Card
+      className={styles.card}
+      sx={{
+        backgroundColor: "#202020",
+        borderColor: "#2B2B2B",
+        borderWidth: 1.9,
+        color: "#ffffff",
+        maxWidth: 600,
+        minWidth: 600,
+        maxHeight: 100,
+        borderRadius: 10,
+        boxShadow: 5,
+        textAlign: "left",
+      }}
+      variant="outlined"
+      raised={true}
+    >
+      <React.Fragment>
+        <CardContent onClick={handleOpen} className={styles.tasks}>
+          <Typography className={styles.title}>{title}</Typography>
+          <Typography className={styles.description}>
+            {desc + " | " + parseStatus(status)}
+          </Typography>
+        </CardContent>
+      </React.Fragment>
+    </Card>
+  );
+}
+
+TaskCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  status: PropTypes.string.isRequired,
+  handleOpen: PropTypes.func.isRequired,
+};
 
 function TaskDialog(props) {
-  const { onClose, open, addData } = props;
-
-  const handleClose = () => {
-    onClose();
-  };
+  const {
+    header,
+    confirmButton,
+    handleClose,
+    open,
+    addData,
+    title,
+    description,
+    status,
+  } = props;
 
   return (
     <Dialog
@@ -70,7 +110,7 @@ function TaskDialog(props) {
         },
       }}
     >
-      <DialogTitle className={styles.dialogTitle}>Add new task</DialogTitle>
+      <DialogTitle className={styles.dialogTitle}>{header}</DialogTitle>
       <DialogContent>
         <TextField
           sx={{
@@ -113,6 +153,7 @@ function TaskDialog(props) {
           name="title"
           label="Title"
           type="title"
+          defaultValue={title}
           fullWidth
           variant="outlined"
         />
@@ -155,6 +196,7 @@ function TaskDialog(props) {
           name="description"
           label="Description"
           type="descripotion"
+          defaultValue={description}
           fullWidth
           variant="outlined"
         />
@@ -198,6 +240,7 @@ function TaskDialog(props) {
           name="status"
           label="Status"
           type="status"
+          defaultValue={status}
           fullWidth
           variant="outlined"
         />
@@ -223,7 +266,7 @@ function TaskDialog(props) {
           }}
           type="submit"
         >
-          Create
+          {confirmButton}
         </Button>
       </DialogActions>
     </Dialog>
@@ -231,22 +274,58 @@ function TaskDialog(props) {
 }
 
 TaskDialog.propTypes = {
-  onClose: PropTypes.func.isRequired,
+  header: PropTypes.string.isRequired,
+  confirmButton: PropTypes.string.isRequired,
+  handleClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
+  addData: PropTypes.func.isRequired,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  status: PropTypes.number,
 };
 
 export default function Tasks() {
-  const [open, setOpen] = React.useState(false);
+  const [addOpen, setAddOpen] = React.useState(false);
+  const [currentTask, setCurrentTask] = React.useState({
+    id: null,
+    title: "",
+    description: "",
+    status: "",
+  });
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleOpenAdd = () => {
+    setAddOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseAdd = () => {
+    setAddOpen(false);
+  };
+
+  const handleOpenEdit = (task) => {
+    console.log("task", task);
+    setCurrentTask(task);
+    console.log("current task", currentTask);
+  };
+
+  const handleCloseEdit = () => {
+    setCurrentTask({ id: null, title: "", description: "", status: "" });
   };
 
   const [tasks, setTasks] = useState([]);
+
+  const editData = async (id, title, description, status) => {
+    try {
+      const taskDoc = doc(db, "tasks", id);
+      await updateDoc(taskDoc, {
+        title: title,
+        description: description,
+        status: status,
+      });
+      console.log("Document updated with ID: ", id);
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  };
 
   const addData = async (title, description, status) => {
     try {
@@ -276,7 +355,6 @@ export default function Tasks() {
 
   useEffect(() => {
     getData();
-    console.log("tasks", tasks);
   }, []);
 
   return (
@@ -292,25 +370,12 @@ export default function Tasks() {
       <Box className={styles.tasks}>
         {tasks.map((task) => (
           <Box key={task.id}>
-            <Card
-              className={styles.card}
-              sx={{
-                backgroundColor: "#202020",
-                borderColor: "#2B2B2B",
-                borderWidth: 1.9,
-                color: "#ffffff",
-                maxWidth: 600,
-                minWidth: 600,
-                maxHeight: 100,
-                borderRadius: 10,
-                boxShadow: 5,
-                textAlign: "left",
-              }}
-              variant="outlined"
-              raised={true}
-            >
-              {card(task.title, task.description, parseStatus(task.status))}
-            </Card>
+            <TaskCard
+              title={task.title}
+              desc={task.description}
+              status={task.status}
+              handleOpen={() => handleOpenEdit(task)}
+            />
           </Box>
         ))}
       </Box>
@@ -319,11 +384,27 @@ export default function Tasks() {
         className={styles.button}
         color="primary"
         aria-label="add-task"
-        onClick={handleClickOpen}
+        onClick={handleOpenAdd}
       >
         <AddIcon />
       </Fab>
-      <TaskDialog open={open} onClose={handleClose} addData={addData} />
+      <TaskDialog
+        header="Add new task"
+        confirmButton="Create"
+        open={addOpen}
+        handleClose={handleCloseAdd}
+        addData={addData}
+      />
+      <TaskDialog
+        header="Edit task"
+        confirmButton="Save"
+        title={currentTask.title}
+        description={currentTask.description}
+        status={currentTask.status}
+        open={currentTask.id !== null}
+        handleClose={handleCloseEdit}
+        addData={editData}
+      />
     </Box>
   );
 }

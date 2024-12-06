@@ -99,20 +99,8 @@
   margin-top: 90vh !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes App-link-bounce {
-  from {
-    transform: translate(0);
-  }
-  to {
-    transform: translate(0px, 10px);
-  }
+.smallButton {
+  align-items: flex-end;
+  align-self: flex-end;
+  margin-top: 0vh !important;
 }
