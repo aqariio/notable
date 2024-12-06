@@ -35,7 +35,7 @@ const card = (title, desc, status) => (
 );
 
 function TaskDialog(props) {
-  const { onClose, open } = props;
+  const { onClose, open, addData } = props;
 
   const handleClose = () => {
     onClose();
@@ -62,8 +62,10 @@ function TaskDialog(props) {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
           const formJson = Object.fromEntries(formData.entries());
-          const email = formJson.email;
-          console.log(email);
+          const title = formJson.title;
+          const description = formJson.description;
+          const status = formJson.status;
+          addData(title, description, parseInt(status));
           handleClose();
         },
       }}
@@ -72,18 +74,19 @@ function TaskDialog(props) {
       <DialogContent>
         <TextField
           sx={{
+            color: "#aaaaaa !important",
             borderRadius: "50px",
             boxShadow: 5,
             backgroundColor: "#202020",
             "& .MuiInputBase-input": {
               fontFamily: '"Inter", sans-serif',
               fontWeight: 400,
-              color: "#aaaaaa",
+              color: "#aaaaaa !important",
             },
             "& .MuiInputLabel-root": {
               fontFamily: '"Inter", sans-serif',
               fontWeight: 400,
-              color: "#aaaaaa",
+              color: "#aaaaaa !important",
             },
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
@@ -115,18 +118,19 @@ function TaskDialog(props) {
         />
         <TextField
           sx={{
+            color: "#aaaaaa !important",
             borderRadius: "50px",
             boxShadow: 5,
             backgroundColor: "#202020",
             "& .MuiInputBase-input": {
               fontFamily: '"Inter", sans-serif',
               fontWeight: 400,
-              color: "#aaaaaa",
+              color: "#aaaaaa !important",
             },
             "& .MuiInputLabel-root": {
               fontFamily: '"Inter", sans-serif',
               fontWeight: 400,
-              color: "#aaaaaa",
+              color: "#aaaaaa !important",
             },
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
@@ -156,18 +160,19 @@ function TaskDialog(props) {
         />
         <TextField
           sx={{
+            color: "#aaaaaa !important",
             borderRadius: "50px",
             boxShadow: 5,
             backgroundColor: "#202020",
             "& .MuiInputBase-input": {
               fontFamily: '"Inter", sans-serif',
               fontWeight: 400,
-              color: "#aaaaaa",
+              color: "#aaaaaa !important",
             },
             "& .MuiInputLabel-root": {
               fontFamily: '"Inter", sans-serif',
               fontWeight: 400,
-              color: "#aaaaaa",
+              color: "#aaaaaa !important",
             },
             "& .MuiOutlinedInput-root": {
               "& fieldset": {
@@ -202,6 +207,8 @@ function TaskDialog(props) {
           sx={{
             textTransform: "none",
             color: "#aaaaaa",
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 600,
           }}
           onClick={handleClose}
         >
@@ -210,6 +217,9 @@ function TaskDialog(props) {
         <Button
           sx={{
             textTransform: "none",
+            color: "#5798f7",
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 600,
           }}
           type="submit"
         >
@@ -229,7 +239,6 @@ export default function Tasks() {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
-    console.log("handle click");
     setOpen(true);
   };
 
@@ -239,12 +248,12 @@ export default function Tasks() {
 
   const [tasks, setTasks] = useState([]);
 
-  const addData = async () => {
+  const addData = async (title, description, status) => {
     try {
       const docRef = await addDoc(collection(db, "tasks"), {
-        title: "amongus",
-        description: "bottom text",
-        status: 69,
+        title: title,
+        description: description,
+        status: status,
       });
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -314,7 +323,7 @@ export default function Tasks() {
       >
         <AddIcon />
       </Fab>
-      <TaskDialog open={open} onClose={handleClose} />
+      <TaskDialog open={open} onClose={handleClose} addData={addData} />
     </Box>
   );
 }
