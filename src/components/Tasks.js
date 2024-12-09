@@ -23,10 +23,34 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
+import Slider from "@mui/material/Slider";
 
 function parseStatus(status) {
   return Math.min(Math.max(0, status), 100) + "% complete";
 }
+
+const marks = [
+  {
+    value: 0,
+    label: "0%",
+  },
+  {
+    value: 25,
+    label: "25%",
+  },
+  {
+    value: 50,
+    label: "50%",
+  },
+  {
+    value: 75,
+    label: "75%",
+  },
+  {
+    value: 100,
+    label: "100%",
+  },
+];
 
 function TaskCard(props) {
   const { title, desc, status, handleOpen } = props;
@@ -81,11 +105,19 @@ function TaskDialog(props) {
     description,
     status,
   } = props;
+  
+  const [value, setValue] = React.useState(status);
+
+  const handleChange = (event, newValue) => {
+    if (typeof newValue === 'number') {
+      setValue(newValue);
+    }
+  };
 
   const handleDelete = (id) => {
     deleteData(id);
     handleClose();
-  }
+  };
 
   return (
     <Dialog
@@ -158,7 +190,7 @@ function TaskDialog(props) {
           id="title"
           name="title"
           label="Title"
-          type="title"
+          type="text"
           defaultValue={title}
           fullWidth
           variant="outlined"
@@ -201,7 +233,7 @@ function TaskDialog(props) {
           id="description"
           name="description"
           label="Description"
-          type="descripotion"
+          type="text"
           defaultValue={description}
           fullWidth
           variant="outlined"
@@ -245,10 +277,24 @@ function TaskDialog(props) {
           id="status"
           name="status"
           label="Status"
-          type="status"
+          type="text"
           defaultValue={status}
           fullWidth
           variant="outlined"
+        />
+        <Typography gutterBottom>
+          {value}% complete
+        </Typography>
+        <Slider
+          aria-label="Completion"
+          defaultValue={status}
+          valueLabelDisplay="off"
+        onChange={handleChange}
+          marks={marks}
+          shiftStep={10}
+          step={5}
+          min={0}
+          max={100}
         />
       </DialogContent>
       <DialogActions
