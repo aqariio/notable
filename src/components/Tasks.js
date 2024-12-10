@@ -29,6 +29,26 @@ function parseStatus(status) {
   return Math.min(Math.max(0, status), 100) + "% complete";
 }
 
+function calculateColor(status) {
+  status = Math.min(Math.max(1, status), 100);
+
+  const red = Math.floor(0.75 * Math.sqrt(lerp(255 ** 2, 50 ** 2, status / 100)));
+  const green = Math.floor(0.75 * Math.sqrt(lerp(36 ** 2, 205 ** 2, status / 100)));
+  const blue = Math.floor(0.75 * Math.sqrt(lerp(0, 50 ** 2, status / 100)));
+
+  // Convert the red and green components to hexadecimal and pad with zeros if necessary
+  const redHex = red.toString(16).padStart(2, "0");
+  const greenHex = green.toString(16).padStart(2, "0");
+  const blueHex = blue.toString(16).padStart(2, "0");
+
+  // Return the color in hexadecimal format
+  return `#${redHex}${greenHex}${blueHex}`;
+}
+
+function lerp(a, b, delta) {
+  return (1 - delta) * a + delta * b;
+}
+
 const marks = [
   {
     value: 0,
@@ -105,12 +125,18 @@ function TaskDialog(props) {
     description,
     status,
   } = props;
-  
-  const [value, setValue] = React.useState(status);
+
+  const [completion, setCompletion] = React.useState(status);
+
+  useEffect(() => {
+    if (open) {
+      setCompletion(status);
+    }
+  }, [status]);
 
   const handleChange = (event, newValue) => {
-    if (typeof newValue === 'number') {
-      setValue(newValue);
+    if (typeof newValue === "number") {
+      setCompletion(newValue);
     }
   };
 
@@ -142,7 +168,7 @@ function TaskDialog(props) {
           const formJson = Object.fromEntries(formData.entries());
           const title = formJson.title;
           const description = formJson.description;
-          const status = formJson.status;
+          const status = completion;
           addData(id, title, description, parseInt(status));
           handleClose();
         },
@@ -238,7 +264,7 @@ function TaskDialog(props) {
           fullWidth
           variant="outlined"
         />
-        <TextField
+        {/* <TextField
           sx={{
             color: "#aaaaaa !important",
             borderRadius: "50px",
@@ -281,17 +307,52 @@ function TaskDialog(props) {
           defaultValue={status}
           fullWidth
           variant="outlined"
-        />
-        <Typography gutterBottom>
-          {value}% complete
+        /> */}
+        <Typography
+          gutterBottom
+          sx={{
+            marginTop: 2,
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 400,
+            color: "#aaaaaa",
+          }}
+        >
+          {completion}% complete
         </Typography>
         <Slider
           aria-label="Completion"
+          sx={{
+            color: calculateColor(completion),
+            "& .MuiSlider-track": {
+              height: completion === 0 ? 0 : 14,
+              marginLeft: "0.1rem !important",
+              maxWidth: "99.6%",
+            },
+            "& .MuiSlider-thumb": {
+              height: 0,
+              width: 0,
+            },
+            "& .MuiSlider-rail": {
+              backgroundColor: "#2b2b2b",
+              border: "2px solid #505050",
+              height: 16,
+            },
+            "& .MuiSlider-mark": {
+              backgroundColor: "#505050",
+              height: 8,
+              width: 2,
+              marginLeft: "0.13rem !important",
+            },
+            "& .MuiSlider-markLabel": {
+              color: "#aaaaaa",
+              fontSize: "12px",
+            },
+          }}
           defaultValue={status}
           valueLabelDisplay="off"
-        onChange={handleChange}
+          onChange={handleChange}
           marks={marks}
-          shiftStep={10}
+          shiftStep={5}
           step={5}
           min={0}
           max={100}
