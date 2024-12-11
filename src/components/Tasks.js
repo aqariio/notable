@@ -115,10 +115,8 @@ function TaskCard(props) {
         borderColor: "#2B2B2B",
         borderWidth: 1.9,
         color: "#ffffff",
-        maxWidth: 600,
-        minWidth: 600,
         maxHeight: 100,
-        borderRadius: 10,
+        borderRadius: 8,
         boxShadow: 5,
         textAlign: "left",
       }}

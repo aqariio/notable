@@ -49,7 +49,7 @@ const Navbar = () => {
 
   return (
     <AppBar position="fixed" color="primary" className={styles.navbar}>
-      <Container maxWidth="xl">
+      <Container maxWidth={false}>
         <Toolbar disableGutters>
           <Typography
             className={styles.homeButton}
