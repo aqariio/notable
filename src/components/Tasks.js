@@ -165,7 +165,6 @@ function TaskDialog(props) {
   } = props;
 
   const [completion, setCompletion] = React.useState(status);
-
   const [importance, setImportance] = React.useState(priority);
 
   useEffect(() => {
@@ -173,7 +172,7 @@ function TaskDialog(props) {
       setCompletion(status);
       setImportance(priority);
     }
-  }, [status, priority]);
+  }, [open, status, priority]);
 
   const onCompletionChange = (event, newValue) => {
     if (typeof newValue === "number") {
@@ -339,15 +338,18 @@ function TaskDialog(props) {
               height: completion === 0 ? 0 : 14,
               marginLeft: "0.1rem !important",
               maxWidth: "99.6%",
+              transition: "none",
             },
             "& .MuiSlider-thumb": {
               height: 0,
               width: 0,
+              transition: "none",
             },
             "& .MuiSlider-rail": {
               backgroundColor: "#2b2b2b",
               border: "2px solid #505050",
               height: 16,
+              transition: "none",
             },
             "& .MuiSlider-mark": {
               backgroundColor: "#505050",
@@ -392,15 +394,18 @@ function TaskDialog(props) {
               height: importance === 4 ? 0 : 14,
               marginLeft: "0.1rem !important",
               maxWidth: "99.6%",
+              transition: "none",
             },
             "& .MuiSlider-thumb": {
               height: 0,
               width: 0,
+              transition: "none",
             },
             "& .MuiSlider-rail": {
               backgroundColor: "#2b2b2b",
               border: "2px solid #505050",
               height: 16,
+              transition: "none",
             },
             "& .MuiSlider-mark": {
               backgroundColor: "#505050",
