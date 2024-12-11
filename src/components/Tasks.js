@@ -29,12 +29,32 @@ function parseStatus(status) {
   return Math.min(Math.max(0, status), 100) + "% complete";
 }
 
-function calculateColor(status) {
-  status = Math.min(Math.max(1, status), 100);
+function parsePriority(priority) {
+  return "P" + Math.min(Math.max(0, priority), 4);
+}
 
-  const red = Math.floor(0.75 * Math.sqrt(lerp(255 ** 2, 50 ** 2, status / 100)));
-  const green = Math.floor(0.75 * Math.sqrt(lerp(36 ** 2, 205 ** 2, status / 100)));
-  const blue = Math.floor(0.75 * Math.sqrt(lerp(0, 50 ** 2, status / 100)));
+function Color(r, g, b) {
+  this.r = r;
+  this.g = g;
+  this.b = b;
+}
+
+function calculateColor(
+  delta,
+  startColor = new Color(0, 0, 0),
+  endColor = new Color(0, 0, 0)
+) {
+  delta = Math.min(Math.max(0, delta), 1);
+
+  const red = Math.floor(
+    0.75 * Math.sqrt(lerp(startColor.r ** 2, endColor.r ** 2, delta))
+  );
+  const green = Math.floor(
+    0.75 * Math.sqrt(lerp(startColor.g ** 2, endColor.g ** 2, delta))
+  );
+  const blue = Math.floor(
+    0.75 * Math.sqrt(lerp(startColor.b ** 2, endColor.b ** 2, delta))
+  );
 
   // Convert the red and green components to hexadecimal and pad with zeros if necessary
   const redHex = red.toString(16).padStart(2, "0");
@@ -49,7 +69,7 @@ function lerp(a, b, delta) {
   return (1 - delta) * a + delta * b;
 }
 
-const marks = [
+const statusMarks = [
   {
     value: 0,
     label: "0%",
@@ -72,8 +92,20 @@ const marks = [
   },
 ];
 
+const priorityMarks = [
+  {
+    value: 1,
+  },
+  {
+    value: 2,
+  },
+  {
+    value: 3,
+  },
+];
+
 function TaskCard(props) {
-  const { title, desc, status, handleOpen } = props;
+  const { title, desc, status, priority, handleOpen } = props;
 
   return (
     <Card
@@ -97,7 +129,11 @@ function TaskCard(props) {
         <CardContent onClick={handleOpen} className={styles.tasks}>
           <Typography className={styles.title}>{title}</Typography>
           <Typography className={styles.description}>
-            {desc + " | " + parseStatus(status)}
+            {desc +
+              " | " +
+              parseStatus(status) +
+              " | " +
+              parsePriority(priority)}
           </Typography>
         </CardContent>
       </React.Fragment>
@@ -109,6 +145,7 @@ TaskCard.propTypes = {
   title: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
   status: PropTypes.string.isRequired,
+  priority: PropTypes.string.isRequired,
   handleOpen: PropTypes.func.isRequired,
 };
 
@@ -124,25 +161,39 @@ function TaskDialog(props) {
     title,
     description,
     status,
+    priority,
   } = props;
 
   const [completion, setCompletion] = React.useState(status);
 
+  const [importance, setImportance] = React.useState(priority);
+
   useEffect(() => {
     if (open) {
       setCompletion(status);
+      setImportance(priority);
     }
-  }, [status]);
+  }, [status, priority]);
 
-  const handleChange = (event, newValue) => {
+  const onCompletionChange = (event, newValue) => {
     if (typeof newValue === "number") {
       setCompletion(newValue);
+    }
+  };
+
+  const onImportanceChange = (event, newValue) => {
+    if (typeof newValue === "number") {
+      setImportance(invertImportance(newValue));
     }
   };
 
   const handleDelete = (id) => {
     deleteData(id);
     handleClose();
+  };
+
+  const invertImportance = (value) => {
+    return 4 - value;
   };
 
   return (
@@ -168,8 +219,9 @@ function TaskDialog(props) {
           const formJson = Object.fromEntries(formData.entries());
           const title = formJson.title;
           const description = formJson.description;
-          const status = completion;
-          addData(id, title, description, parseInt(status));
+          const status = parseInt(completion);
+          const priority = parseInt(importance);
+          addData(id, title, description, status, priority);
           handleClose();
         },
       }}
@@ -264,50 +316,6 @@ function TaskDialog(props) {
           fullWidth
           variant="outlined"
         />
-        {/* <TextField
-          sx={{
-            color: "#aaaaaa !important",
-            borderRadius: "50px",
-            boxShadow: 5,
-            backgroundColor: "#202020",
-            "& .MuiInputBase-input": {
-              fontFamily: '"Inter", sans-serif',
-              fontWeight: 400,
-              color: "#aaaaaa !important",
-            },
-            "& .MuiInputLabel-root": {
-              fontFamily: '"Inter", sans-serif',
-              fontWeight: 400,
-              color: "#aaaaaa !important",
-            },
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: "#2B2B2B",
-                borderWidth: "2px",
-                borderRadius: "50px",
-              },
-              "&:hover fieldset": {
-                borderColor: "#404040",
-                borderWidth: "2px",
-                borderRadius: "50px",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#505050",
-                borderWidth: "2px",
-                borderRadius: "50px",
-              },
-            },
-          }}
-          required
-          margin="dense"
-          id="status"
-          name="status"
-          label="Status"
-          type="text"
-          defaultValue={status}
-          fullWidth
-          variant="outlined"
-        /> */}
         <Typography
           gutterBottom
           sx={{
@@ -322,7 +330,11 @@ function TaskDialog(props) {
         <Slider
           aria-label="Completion"
           sx={{
-            color: calculateColor(completion),
+            color: calculateColor(
+              completion / 100,
+              new Color(255, 36, 0),
+              new Color(50, 205, 50)
+            ),
             "& .MuiSlider-track": {
               height: completion === 0 ? 0 : 14,
               marginLeft: "0.1rem !important",
@@ -350,12 +362,66 @@ function TaskDialog(props) {
           }}
           defaultValue={status}
           valueLabelDisplay="off"
-          onChange={handleChange}
-          marks={marks}
+          onChange={onCompletionChange}
+          marks={statusMarks}
           shiftStep={5}
           step={5}
           min={0}
           max={100}
+        />
+        <Typography
+          gutterBottom
+          sx={{
+            marginTop: 2,
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 400,
+            color: "#aaaaaa",
+          }}
+        >
+          Priority: P{importance}
+        </Typography>
+        <Slider
+          aria-label="Priority"
+          sx={{
+            color: calculateColor(
+              importance / 4,
+              new Color(238, 75, 43),
+              new Color(255, 191, 0)
+            ),
+            "& .MuiSlider-track": {
+              height: importance === 4 ? 0 : 14,
+              marginLeft: "0.1rem !important",
+              maxWidth: "99.6%",
+            },
+            "& .MuiSlider-thumb": {
+              height: 0,
+              width: 0,
+            },
+            "& .MuiSlider-rail": {
+              backgroundColor: "#2b2b2b",
+              border: "2px solid #505050",
+              height: 16,
+            },
+            "& .MuiSlider-mark": {
+              backgroundColor: "#505050",
+              height: 8,
+              width: 2,
+              marginLeft: "0.13rem !important",
+            },
+            "& .MuiSlider-markLabel": {
+              color: "#aaaaaa",
+              fontSize: "12px",
+            },
+          }}
+          defaultValue={priority}
+          value={invertImportance(importance)}
+          valueLabelDisplay="off"
+          onChange={onImportanceChange}
+          marks={priorityMarks}
+          shiftStep={1}
+          step={1}
+          min={0}
+          max={4}
         />
       </DialogContent>
       <DialogActions
@@ -410,13 +476,14 @@ TaskDialog.propTypes = {
   header: PropTypes.string.isRequired,
   confirmButton: PropTypes.string.isRequired,
   handleClose: PropTypes.func.isRequired,
-  handleDelete: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func,
   open: PropTypes.bool.isRequired,
   addData: PropTypes.func.isRequired,
   id: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   status: PropTypes.number,
+  priority: PropTypes.number,
 };
 
 export default function Tasks() {
@@ -426,6 +493,7 @@ export default function Tasks() {
     title: "",
     description: "",
     status: "",
+    priority: "",
   });
 
   const handleOpenAdd = () => {
@@ -446,17 +514,28 @@ export default function Tasks() {
       title: "",
       description: "",
       status: "",
+      priority: "",
     });
   };
 
   const [tasks, setTasks] = useState([]);
 
-  const addData = async (id, title, description, status) => {
+  const sortTasks = (arr) => {
+    arr.sort((a, b) => {
+      if (a.priority === b.priority) {
+        return a.status - b.status;
+      }
+      return a.priority - b.priority;
+    });
+  };
+
+  const addData = async (id, title, description, status, priority) => {
     try {
       const docRef = await addDoc(collection(db, "tasks"), {
         title: title,
         description: description,
         status: status,
+        priority: priority,
       });
       getData();
       console.log("Document written with ID: ", docRef.id);
@@ -472,19 +551,21 @@ export default function Tasks() {
       querySnapshot.forEach((doc) => {
         tasksArray.push({ id: doc.id, ...doc.data() });
       });
+      sortTasks(tasksArray);
       setTasks(tasksArray);
     } catch (e) {
       console.error("Error getting documents: ", e);
     }
   };
 
-  const editData = async (id, title, description, status) => {
+  const editData = async (id, title, description, status, priority) => {
     try {
       const taskDoc = doc(db, "tasks", id);
       await updateDoc(taskDoc, {
         title: title,
         description: description,
         status: status,
+        priority: priority,
       });
       getData();
       console.log("Document updated with ID: ", id);
@@ -524,6 +605,7 @@ export default function Tasks() {
               title={task.title}
               desc={task.description}
               status={task.status}
+              priority={task.priority}
               handleOpen={() => handleOpenEdit(task)}
             />
           </Box>
@@ -541,6 +623,10 @@ export default function Tasks() {
       <TaskDialog
         header="Add new task"
         confirmButton="Create"
+        title=""
+        description=""
+        status={0}
+        priority={4}
         open={addOpen}
         handleClose={handleCloseAdd}
         addData={addData}
@@ -552,6 +638,7 @@ export default function Tasks() {
         title={currentTask.title}
         description={currentTask.description}
         status={currentTask.status}
+        priority={currentTask.priority}
         open={currentTask.id !== null}
         handleClose={handleCloseEdit}
         deleteData={() => deleteData(currentTask.id)}
