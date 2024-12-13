@@ -46,9 +46,14 @@ const Navbar = () => {
 
   const handleLogOut = () => {
     console.log("Logging out");
-    auth.signOut().then(() => {
-      console.log("Logged out");
-    });
+    auth
+      .signOut()
+      .then(() => {
+        console.log("Logged out");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     handleCloseUserMenu();
   };
 
