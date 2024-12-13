@@ -72,7 +72,6 @@ const Login = () => {
           backgroundColor: "#202020",
           color: "#aaaaaa",
           borderRadius: "10px",
-          marginTop: "8vmin",
           boxShadow: 5,
           padding: "20px",
           display: "flex",

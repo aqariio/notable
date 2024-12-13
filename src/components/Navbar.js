@@ -14,6 +14,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { styled } from "@mui/material/styles";
 import Badge from "@mui/material/Badge";
+import { useAuthState } from "react-firebase-hooks/auth";
 import { Link } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import styles from "./Navbar.module.css";
@@ -32,6 +33,7 @@ const settings = [<a class={styles.smallButton}>Logout</a>];
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [user, loading] = useAuthState(auth);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -61,134 +63,147 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <AppBar position="fixed" color="primary" className={styles.navbar}>
-      <Container maxWidth={false}>
-        <Toolbar disableGutters>
-          <Typography
-            className={styles.homeButton}
-            variant="h6"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "Inter",
-              fontWeight: 700,
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            <Link to="/" class={styles.homeButton}>
-              Notable
-            </Link>
-          </Typography>
-
-          {/* small */}
-
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+    user && (
+      <AppBar position="fixed" color="primary" className={styles.navbar}>
+        <Container maxWidth={false}>
+          <Toolbar disableGutters>
+            <Typography
+              className={styles.homeButton}
+              variant="h6"
+              noWrap
+              component="a"
+              href=""
               sx={{
-                display: { xs: "block", md: "none" },
-                "& .MuiMenu-paper": { backgroundColor: "#202020" },
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+                fontFamily: "Inter",
+                fontWeight: 700,
+                color: "inherit",
+                textDecoration: "none",
               }}
             >
-              {pages.map((page) => (
-                <MenuItem className="menu" onClick={handleCloseNavMenu}>
-                  <Typography className={styles.smallButton} textAlign="center">
-                    {page}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+              <Link to="/" class={styles.homeButton}>
+                Notable
+              </Link>
+            </Typography>
 
-          {/* large */}
+            {/* small */}
 
-          <Typography
-            className={styles.homeButton}
-            variant="h6"
-            noWrap
-            component="a"
-            href=""
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "Inter",
-              fontWeight: 700,
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            <Link to="/" class={styles.homeButton}>
-              Notable
-            </Link>
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-            {pages.map((page) => page)}
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Account">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleOpenNavMenu}
+                color="inherit"
+              >
+                <MenuIcon />
               </IconButton>
-            </Tooltip>
-            <Menu
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElNav}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                open={Boolean(anchorElNav)}
+                onClose={handleCloseNavMenu}
+                sx={{
+                  display: { xs: "block", md: "none" },
+                  "& .MuiMenu-paper": { backgroundColor: "#202020" },
+                }}
+              >
+                {pages.map((page) => (
+                  <MenuItem className="menu" onClick={handleCloseNavMenu}>
+                    <Typography
+                      className={styles.smallButton}
+                      textAlign="center"
+                    >
+                      {page}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+
+            {/* large */}
+
+            <Typography
+              className={styles.homeButton}
+              variant="h6"
+              noWrap
+              component="a"
+              href=""
               sx={{
-                mt: "45px",
-                "& .MuiMenu-paper": { backgroundColor: "#202020" },
+                mr: 2,
+                display: { xs: "flex", md: "none" },
+                flexGrow: 1,
+                fontFamily: "Inter",
+                fontWeight: 700,
+                color: "inherit",
+                textDecoration: "none",
               }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "center",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "center",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem className="menu" key={setting} onClick={handleLogOut}>
-                  <Typography sx={{ textAlign: "center" }}>
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
+              <Link to="/" class={styles.homeButton}>
+                Notable
+              </Link>
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              {pages.map((page) => page)}
+            </Box>
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Account">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{
+                  mt: "45px",
+                  "& .MuiMenu-paper": { backgroundColor: "#202020" },
+                }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "center",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "center",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem
+                    className="menu"
+                    key={setting}
+                    onClick={handleLogOut}
+                  >
+                    <Typography sx={{ textAlign: "center" }}>
+                      {setting}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
+    )
   );
 };
 
