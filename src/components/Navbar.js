@@ -17,6 +17,7 @@ import Badge from "@mui/material/Badge";
 import { Link } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import styles from "./Navbar.module.css";
+import { auth } from "./Firebase";
 
 const pages = [
   <Link to="/tasks" class={styles.smallButton}>
@@ -41,6 +42,14 @@ const Navbar = () => {
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
+  };
+
+  const handleLogOut = () => {
+    console.log("Logging out");
+    auth.signOut().then(() => {
+      console.log("Logged out");
+    });
+    handleCloseUserMenu();
   };
 
   const handleCloseUserMenu = () => {
@@ -164,11 +173,7 @@ const Navbar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem
-                  className="menu"
-                  key={setting}
-                  onClick={handleCloseUserMenu}
-                >
+                <MenuItem className="menu" key={setting} onClick={handleLogOut}>
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>
