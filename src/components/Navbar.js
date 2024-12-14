@@ -73,13 +73,13 @@ const Navbar = () => {
         <Container maxWidth={false}>
           <Toolbar disableGutters>
             <Typography
-              className={styles.homeButton}
               variant="h6"
               noWrap
               component="a"
               href=""
               sx={{
                 mr: 2,
+                marginRight: 0,
                 display: { xs: "none", md: "flex" },
                 fontFamily: "Inter",
                 fontWeight: 700,

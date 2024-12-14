@@ -80,8 +80,8 @@ const Login = () => {
           justifyContent: "center",
           height: "100vh",
           alignSelf: "center",
-          width: "50vmin",
-          height: "70vmin",
+          width: "calc(100px + 30vmin)",
+          height: "calc(200px + 30vmin)",
         }}
         variant="outlined"
       >
