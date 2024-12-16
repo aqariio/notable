@@ -73,6 +73,7 @@ const Navbar = () => {
         <Container maxWidth={false}>
           <Toolbar disableGutters>
             <Typography
+              className={styles.homeButton}
               variant="h6"
               noWrap
               component="a"
@@ -87,7 +88,7 @@ const Navbar = () => {
                 textDecoration: "none",
               }}
             >
-              <Link to="/" class={styles.homeButton}>
+              <Link to="/" className={styles.homeButtonLink}>
                 Notable
               </Link>
             </Typography>
