@@ -17,7 +17,7 @@
 
 .homeButton {
   font-family: "Inter", sans-serif;
-  margin-right: 20px;
+  margin-right: 20px !important;
   font-style: bold;
   color: #e6e6e6;
   text-decoration: none !important;
