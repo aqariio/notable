@@ -8,8 +8,9 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  getDoc,
 } from "firebase/firestore";
-import { db } from "./Firebase";
+import { db, auth } from "./Firebase";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
@@ -328,9 +329,9 @@ function TaskDialog(props) {
           aria-label="Completion"
           sx={{
             color: calculateColor(
-              completion / 100,
-              new Color(255, 36, 0),
-              new Color(50, 205, 50)
+              completion >= 50 ? (completion - 50) / 50 : completion / 50,
+              completion >= 50 ? new Color(255, 191, 0) : new Color(255, 36, 0),
+              completion >= 50 ? new Color(50, 205, 50) : new Color(255, 191, 0)
             ),
             "& .MuiSlider-track": {
               height: completion === 0 ? 0 : 14,
@@ -533,13 +534,22 @@ export default function Tasks() {
   };
 
   const addData = async (id, title, description, status, priority) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+
     try {
-      const docRef = await addDoc(collection(db, "tasks"), {
-        title: title,
-        description: description,
-        status: status,
-        priority: priority,
-      });
+      const docRef = await addDoc(
+        collection(db, `userdata/${user.uid}/tasks`),
+        {
+          title: title,
+          description: description,
+          status: status,
+          priority: priority,
+        }
+      );
       getData();
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -548,8 +558,16 @@ export default function Tasks() {
   };
 
   const getData = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+
     try {
-      const querySnapshot = await getDocs(collection(db, "tasks"));
+      const querySnapshot = await getDocs(
+        collection(db, `userdata/${user.uid}/tasks`)
+      );
       const tasksArray = [];
       querySnapshot.forEach((doc) => {
         tasksArray.push({ id: doc.id, ...doc.data() });
@@ -562,8 +580,14 @@ export default function Tasks() {
   };
 
   const editData = async (id, title, description, status, priority) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+
     try {
-      const taskDoc = doc(db, "tasks", id);
+      const taskDoc = doc(db, `userdata/${user.uid}/tasks`, id);
       await updateDoc(taskDoc, {
         title: title,
         description: description,
@@ -578,8 +602,14 @@ export default function Tasks() {
   };
 
   const deleteData = async (id) => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.error("User not authenticated");
+      return;
+    }
+
     try {
-      await deleteDoc(doc(db, "tasks", id));
+      await deleteDoc(doc(db, `userdata/${user.uid}/tasks`, id));
       console.log("Document deleted with ID: ", id);
       getData();
     } catch (e) {

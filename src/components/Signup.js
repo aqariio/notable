@@ -71,7 +71,9 @@ const Signup = () => {
         sx={{
           backgroundColor: "#202020",
           color: "#aaaaaa",
-          borderRadius: "10px",
+          borderRadius: "30px",
+          borderWidth: "1px",
+          borderColor: "#2B2B2B",
           boxShadow: 5,
           padding: "20px",
           display: "flex",

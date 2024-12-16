@@ -71,7 +71,9 @@ const Login = () => {
         sx={{
           backgroundColor: "#202020",
           color: "#aaaaaa",
-          borderRadius: "10px",
+          borderRadius: "30px",
+          borderWidth: "1px",
+          borderColor: "#2B2B2B",
           boxShadow: 5,
           padding: "20px",
           display: "flex",
@@ -95,7 +97,7 @@ const Login = () => {
             marginTop: 0,
           }}
         >
-          <Typography className={styles.header}>Log in</Typography>
+          <Typography className={styles.header}>Sign in</Typography>
           <TextField
             sx={{
               color: "#aaaaaa !important",
