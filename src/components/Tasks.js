@@ -141,8 +141,7 @@ function TaskCard(props) {
               " | " +
               parsePriority(priority) +
               " | " +
-              dayjs(date.toDate()).format("MMMM D, YYYY")
-            }
+              dayjs(date.toDate()).format("MMMM D, YYYY")}
           </Typography>
         </CardContent>
       </React.Fragment>
@@ -658,10 +657,16 @@ export default function Tasks() {
 
   const sortTasks = (arr) => {
     arr.sort((a, b) => {
-      if (a.priority === b.priority) {
-        return a.status - b.status;
+      const dateA = dayjs(a.date.toDate());
+      const dateB = dayjs(b.date.toDate());
+
+      if (dateA.isSame(dateB)) {
+        if (a.priority === b.priority) {
+          return a.status - b.status;
+        }
+        return a.priority - b.priority;
       }
-      return a.priority - b.priority;
+      return dateA.isBefore(dateB) ? -1 : 1;
     });
   };
 
