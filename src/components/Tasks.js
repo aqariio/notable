@@ -10,10 +10,12 @@ import {
   deleteDoc,
   getDoc,
 } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { db, auth } from "./Firebase";
 import Box from "@mui/material/Box";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
+import TodayIcon from "@mui/icons-material/Today";
 import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -25,6 +27,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
 import Slider from "@mui/material/Slider";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import Popover from "@mui/material/Popover";
+import dayjs from "dayjs";
 
 function parseStatus(status) {
   return Math.min(Math.max(0, status), 100) + "% complete";
@@ -106,7 +113,7 @@ const priorityMarks = [
 ];
 
 function TaskCard(props) {
-  const { title, desc, status, priority, handleOpen } = props;
+  const { title, desc, date, status, priority, handleOpen } = props;
 
   return (
     <Card
@@ -132,7 +139,10 @@ function TaskCard(props) {
               " | " +
               parseStatus(status) +
               " | " +
-              parsePriority(priority)}
+              parsePriority(priority) +
+              " | " +
+              dayjs(date.toDate()).format("MMMM D, YYYY")
+            }
           </Typography>
         </CardContent>
       </React.Fragment>
@@ -143,6 +153,7 @@ function TaskCard(props) {
 TaskCard.propTypes = {
   title: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
+  date: PropTypes.object.isRequired,
   status: PropTypes.string.isRequired,
   priority: PropTypes.string.isRequired,
   handleOpen: PropTypes.func.isRequired,
@@ -159,19 +170,34 @@ function TaskDialog(props) {
     id,
     title,
     description,
+    date,
     status,
     priority,
   } = props;
 
   const [completion, setCompletion] = React.useState(status);
   const [importance, setImportance] = React.useState(priority);
+  const [dueDate, setDueDate] = React.useState(dayjs(date.toDate()));
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleCalendarClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCalendarClose = () => {
+    setAnchorEl(null);
+  };
+
+  const calendarOpen = Boolean(anchorEl);
+  const calId = calendarOpen ? "simple-popover" : undefined;
 
   useEffect(() => {
     if (open) {
       setCompletion(status);
       setImportance(priority);
+      setDueDate(dayjs(date.toDate()));
     }
-  }, [open, status, priority]);
+  }, [open, status, priority, date]);
 
   const onCompletionChange = (event, newValue) => {
     if (typeof newValue === "number") {
@@ -217,9 +243,10 @@ function TaskDialog(props) {
           const formJson = Object.fromEntries(formData.entries());
           const title = formJson.title;
           const description = formJson.description;
+          const date = Timestamp.fromDate(dueDate.toDate());
           const status = parseInt(completion);
           const priority = parseInt(importance);
-          addData(id, title, description, status, priority);
+          addData(id, title, description, date, status, priority);
           handleClose();
         },
       }}
@@ -427,6 +454,108 @@ function TaskDialog(props) {
           min={0}
           max={4}
         />
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginTop: 2,
+          }}
+        >
+          <Typography
+            gutterBottom
+            sx={{
+              marginTop: 2,
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 400,
+              textAlign: "left",
+              alignItems: "flex-start !important",
+              justifyContent: "flex-start !important",
+              color: "#aaaaaa",
+            }}
+          >
+            Due date: {dueDate.format("MMMM D, YYYY")}
+          </Typography>
+          <Button
+            sx={{
+              color: "#5798f7",
+              alignSelf: "flex-end !important",
+              textTransform: "none",
+              display: "flex",
+              gap: 1,
+            }}
+            onClick={handleCalendarClick}
+          >
+            <TodayIcon />
+          </Button>
+        </Box>
+        <Popover
+          id={calId}
+          open={calendarOpen}
+          anchorEl={anchorEl}
+          onClose={handleCalendarClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
+          }}
+          PaperProps={{
+            sx: {
+              borderRadius: "10px",
+              backgroundColor: "#2b2b2b",
+            },
+          }}
+        >
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateCalendar
+              sx={{
+                backgroundColor: "#202020",
+                border: "2px solid",
+                borderColor: "#2B2B2B",
+                borderRadius: "10px",
+                color: "#aaaaaa",
+                "& .MuiPickersDay-root": {
+                  color: "#aaaaaa",
+                  "&.Mui-selected": {
+                    backgroundColor: "#505050",
+                    color: "#aaaaaa",
+                  },
+                  "&:hover": {
+                    backgroundColor: "#404040",
+                  },
+                },
+                "& .MuiPickersDay-dayOutsideMonth": {
+                  color: "#404040",
+                },
+                "& .MuiPickersCalendarHeader-root": {
+                  backgroundColor: "#202020",
+                  color: "#aaaaaa",
+                },
+                "& .MuiPickersYear-yearButton": {
+                  color: "#808080",
+                  "&.Mui-selected": {
+                    backgroundColor: "#202020",
+                    color: "#aaaaaa",
+                  },
+                },
+                "& .MuiPickersCalendarHeader-label": {
+                  color: "#aaaaaa",
+                },
+                "& .MuiPickersArrowSwitcher-button": {
+                  color: "#aaaaaa",
+                  "&:hover": {
+                    backgroundColor: "#404040",
+                  },
+                },
+                "& .MuiDayCalendar-weekDayLabel": {
+                  color: "#808080",
+                },
+              }}
+              views={["day"]}
+              value={dueDate}
+              onChange={(value) => setDueDate(value)}
+            />
+          </LocalizationProvider>
+        </Popover>
       </DialogContent>
       <DialogActions
         sx={{
@@ -486,6 +615,7 @@ TaskDialog.propTypes = {
   id: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
+  date: PropTypes.object,
   status: PropTypes.number,
   priority: PropTypes.number,
 };
@@ -496,6 +626,7 @@ export default function Tasks() {
     id: null,
     title: "",
     description: "",
+    date: Timestamp.fromDate(new Date()),
     status: "",
     priority: "",
   });
@@ -517,6 +648,7 @@ export default function Tasks() {
       id: null,
       title: "",
       description: "",
+      date: Timestamp.fromDate(new Date()),
       status: "",
       priority: "",
     });
@@ -533,7 +665,7 @@ export default function Tasks() {
     });
   };
 
-  const addData = async (id, title, description, status, priority) => {
+  const addData = async (id, title, description, date, status, priority) => {
     const user = auth.currentUser;
     if (!user) {
       console.error("User not authenticated");
@@ -546,6 +678,7 @@ export default function Tasks() {
         {
           title: title,
           description: description,
+          date: date,
           status: status,
           priority: priority,
         }
@@ -579,7 +712,7 @@ export default function Tasks() {
     }
   };
 
-  const editData = async (id, title, description, status, priority) => {
+  const editData = async (id, title, description, date, status, priority) => {
     const user = auth.currentUser;
     if (!user) {
       console.error("User not authenticated");
@@ -591,6 +724,7 @@ export default function Tasks() {
       await updateDoc(taskDoc, {
         title: title,
         description: description,
+        date: date,
         status: status,
         priority: priority,
       });
@@ -637,6 +771,7 @@ export default function Tasks() {
             <TaskCard
               title={task.title}
               desc={task.description}
+              date={task.date}
               status={task.status}
               priority={task.priority}
               handleOpen={() => handleOpenEdit(task)}
@@ -658,6 +793,7 @@ export default function Tasks() {
         confirmButton="Create"
         title=""
         description=""
+        date={dayjs()}
         status={0}
         priority={4}
         open={addOpen}
@@ -670,6 +806,7 @@ export default function Tasks() {
         id={currentTask.id}
         title={currentTask.title}
         description={currentTask.description}
+        date={currentTask.date}
         status={currentTask.status}
         priority={currentTask.priority}
         open={currentTask.id !== null}
