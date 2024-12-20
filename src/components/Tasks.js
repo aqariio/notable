@@ -687,7 +687,7 @@ export default function Tasks() {
       console.log("-------------------")
       console.log(a.title, weightA);
       console.log(b.title, weightB);
-      console.log("signum", Math.sign(weightA - weightB));
+      console.log("sort order:", weightB - weightA < 0 ? "no change" : "switch");
 
       return weightB - weightA;
     });
