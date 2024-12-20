@@ -663,15 +663,20 @@ export default function Tasks() {
     arr.sort((a, b) => {
       const dateA = dayjs(a.date.toDate());
       const dateB = dayjs(b.date.toDate());
+
+      // Reciprocal of the time difference in milliseconds
       let weightA = 1 / (dateA.toDate().getTime() - new Date().getTime());
       let weightB = 1 / (dateB.toDate().getTime() - new Date().getTime());
 
+      // 100% = 0, 50% = 0.5, 0% = 1
       weightA *= Math.abs(100 - a.status) / 100;
       weightB *= Math.abs(100 - b.status) / 100;
 
+      // P0 = 1, P1 = 0.75, P2 = 0.5, P3 = 0.25, P4 = 0
       weightA *= Math.abs(4 - a.priority) / 4;
       weightB *= Math.abs(4 - b.priority) / 4;
 
+      // Invert the weight if the task is overdue, so its always larger
       if (weightA < 0) {
         weightA = -1 / weightA;
       }
