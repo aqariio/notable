@@ -194,7 +194,7 @@ function TaskDialog(props) {
     if (open) {
       setCompletion(status);
       setImportance(priority);
-      setDueDate(dayjs(date.toDate()));
+      setDueDate(dayjs(date.toDate()).hour(23).minute(59).second(59).millisecond(999));
     }
   }, [open, status, priority, date]);
 
@@ -238,6 +238,10 @@ function TaskDialog(props) {
         component: "form",
         onSubmit: (event) => {
           event.preventDefault();
+          dueDate.set("hour", 23);
+          dueDate.set("minute", 59);
+          dueDate.set("second", 59);
+          dueDate.set("millisecond", 999);
           const formData = new FormData(event.currentTarget);
           const formJson = Object.fromEntries(formData.entries());
           const title = formJson.title;
@@ -659,14 +663,28 @@ export default function Tasks() {
     arr.sort((a, b) => {
       const dateA = dayjs(a.date.toDate());
       const dateB = dayjs(b.date.toDate());
+      let weightA = 1 / (dateA.toDate().getTime() - new Date().getTime());
+      let weightB = 1 / (dateB.toDate().getTime() - new Date().getTime());
 
-      if (dateA.isSame(dateB)) {
-        if (a.priority === b.priority) {
-          return a.status - b.status;
-        }
-        return a.priority - b.priority;
+      weightA *= Math.abs(100 - a.status) / 100;
+      weightB *= Math.abs(100 - b.status) / 100;
+
+      weightA *= Math.abs(4 - a.priority) / 4;
+      weightB *= Math.abs(4 - b.priority) / 4;
+
+      if (weightA < 0) {
+        weightA = -1 / weightA;
       }
-      return dateA.isBefore(dateB) ? -1 : 1;
+      if (weightB < 0) {
+        weightB = -1 / weightB;
+      }
+
+      console.log("-------------------")
+      console.log(a.title, weightA);
+      console.log(b.title, weightB);
+      console.log("signum", Math.sign(weightA - weightB));
+
+      return weightB - weightA;
     });
   };
 
