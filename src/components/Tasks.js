@@ -47,6 +47,15 @@ function Color(r, g, b) {
   this.b = b;
 }
 
+function calculateDateColor(date, status) {
+  const now = dayjs();
+  const due = dayjs(date.toDate());
+  if (due.isBefore(now) && status < 100) {
+    return "#dd5050";
+  }
+  return "#40aadd";
+}
+
 function calculateColor(
   delta,
   startColor = new Color(0, 0, 0),
@@ -62,6 +71,32 @@ function calculateColor(
   );
   const blue = Math.floor(
     0.75 * Math.sqrt(lerp(startColor.b ** 2, endColor.b ** 2, delta))
+  );
+
+  // Convert the red and green components to hexadecimal and pad with zeros if necessary
+  const redHex = red.toString(16).padStart(2, "0");
+  const greenHex = green.toString(16).padStart(2, "0");
+  const blueHex = blue.toString(16).padStart(2, "0");
+
+  // Return the color in hexadecimal format
+  return `#${redHex}${greenHex}${blueHex}`;
+}
+
+function calculateColorNoDim(
+  delta,
+  startColor = new Color(0, 0, 0),
+  endColor = new Color(0, 0, 0)
+) {
+  delta = Math.min(Math.max(0, delta), 1);
+
+  const red = Math.floor(
+    Math.sqrt(lerp(startColor.r ** 2, endColor.r ** 2, delta))
+  );
+  const green = Math.floor(
+    Math.sqrt(lerp(startColor.g ** 2, endColor.g ** 2, delta))
+  );
+  const blue = Math.floor(
+    Math.sqrt(lerp(startColor.b ** 2, endColor.b ** 2, delta))
   );
 
   // Convert the red and green components to hexadecimal and pad with zeros if necessary
@@ -134,14 +169,49 @@ function TaskCard(props) {
       <React.Fragment>
         <CardContent onClick={handleOpen} className={styles.tasks}>
           <Typography className={styles.title}>{title}</Typography>
+          <Typography className={styles.description}>{desc}</Typography>
           <Typography className={styles.description}>
-            {desc +
-              " | " +
-              parseStatus(status) +
-              " | " +
-              parsePriority(priority) +
-              " | " +
-              dayjs(date.toDate()).format("MMMM D, YYYY")}
+            {"["}
+            <Typography
+              display="inline"
+              sx={{
+                color:
+                  calculateColorNoDim(
+                    status >= 50 ? (status - 50) / 50 : status / 50,
+                    status >= 50
+                      ? new Color(255, 191, 0)
+                      : new Color(255, 36, 0),
+                    status >= 50
+                      ? new Color(50, 205, 50)
+                      : new Color(255, 191, 0)
+                  ) + " !important",
+              }}
+            >
+              {parseStatus(status)}
+            </Typography>
+            {"]"}&nbsp;{"["}
+            <Typography
+              display="inline"
+              sx={{
+                color: calculateColorNoDim(
+                  priority / 4,
+                  new Color(238, 75, 43),
+                  new Color(255, 191, 0)
+                ),
+              }}
+            >
+              {parsePriority(priority)}
+            </Typography>
+            {"]"}&nbsp;{"["}
+            <Typography
+              display="inline"
+              sx={{
+                color: calculateDateColor(date, status) + " !important",
+              }}
+            >
+              {dayjs(date.toDate()).format("MMMM D, YYYY")}
+            </Typography>
+            {"]"}
           </Typography>
         </CardContent>
       </React.Fragment>
@@ -194,7 +264,9 @@ function TaskDialog(props) {
     if (open) {
       setCompletion(status);
       setImportance(priority);
-      setDueDate(dayjs(date.toDate()).hour(23).minute(59).second(59).millisecond(999));
+      setDueDate(
+        dayjs(date.toDate()).hour(23).minute(59).second(59).millisecond(999)
+      );
     }
   }, [open, status, priority, date]);
 
@@ -672,9 +744,9 @@ export default function Tasks() {
       weightA *= Math.abs(100 - a.status) / 100;
       weightB *= Math.abs(100 - b.status) / 100;
 
-      // P0 = 1, P1 = 0.75, P2 = 0.5, P3 = 0.25, P4 = 0
-      weightA *= Math.abs(4 - a.priority) / 4;
-      weightB *= Math.abs(4 - b.priority) / 4;
+      // P0 = 1, P1 = 0.75, P2 = 0.5, P3 = 0.25, P4 = 0.05
+      weightA *= Math.max(Math.abs(4 - a.priority) / 4, 0.05);
+      weightB *= Math.max(Math.abs(4 - b.priority) / 4, 0.05);
 
       // Invert the weight if the task is overdue, so its always larger
       if (weightA < 0) {
@@ -684,10 +756,13 @@ export default function Tasks() {
         weightB = -1 / weightB;
       }
 
-      console.log("-------------------")
+      console.log("-------------------");
       console.log(a.title, weightA);
       console.log(b.title, weightB);
-      console.log("sort order:", weightB - weightA < 0 ? "no change" : "switch");
+      console.log(
+        "sort order:",
+        weightB - weightA < 0 ? "no change" : "switch"
+      );
 
       return weightB - weightA;
     });
