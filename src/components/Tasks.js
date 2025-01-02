@@ -158,7 +158,6 @@ function TaskCard(props) {
         borderColor: "#2B2B2B",
         borderWidth: 1.9,
         color: "#ffffff",
-        maxHeight: 100,
         borderRadius: 8,
         boxShadow: 5,
         textAlign: "left",
@@ -173,6 +172,7 @@ function TaskCard(props) {
           <Typography className={styles.description}>
             {"["}
             <Typography
+              className={styles.description}
               display="inline"
               sx={{
                 color:
@@ -191,6 +191,7 @@ function TaskCard(props) {
             </Typography>
             {"]"}&nbsp;{"["}
             <Typography
+              className={styles.description}
               display="inline"
               sx={{
                 color: calculateColorNoDim(
@@ -204,6 +205,7 @@ function TaskCard(props) {
             </Typography>
             {"]"}&nbsp;{"["}
             <Typography
+              className={styles.description}
               display="inline"
               sx={{
                 color: calculateDateColor(date, status) + " !important",
