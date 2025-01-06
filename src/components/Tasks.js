@@ -33,18 +33,20 @@ import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import Popover from "@mui/material/Popover";
 import dayjs from "dayjs";
 
+class Color {
+  constructor(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
+}
+
 function parseStatus(status) {
   return Math.min(Math.max(0, status), 100) + "% complete";
 }
 
 function parsePriority(priority) {
   return "P" + Math.min(Math.max(0, priority), 4);
-}
-
-function Color(r, g, b) {
-  this.r = r;
-  this.g = g;
-  this.b = b;
 }
 
 function calculateDateColor(date, status) {
@@ -59,44 +61,20 @@ function calculateDateColor(date, status) {
 function calculateColor(
   delta,
   startColor = new Color(0, 0, 0),
-  endColor = new Color(0, 0, 0)
+  endColor = new Color(0, 0, 0),
+  gamma = 1
 ) {
   delta = Math.min(Math.max(0, delta), 1);
+  gamma = Math.min(Math.max(0, gamma), 1);
 
   const red = Math.floor(
-    0.75 * Math.sqrt(lerp(startColor.r ** 2, endColor.r ** 2, delta))
+    gamma * Math.sqrt(lerp(startColor.r ** 2, endColor.r ** 2, delta))
   );
   const green = Math.floor(
-    0.75 * Math.sqrt(lerp(startColor.g ** 2, endColor.g ** 2, delta))
+    gamma * Math.sqrt(lerp(startColor.g ** 2, endColor.g ** 2, delta))
   );
   const blue = Math.floor(
-    0.75 * Math.sqrt(lerp(startColor.b ** 2, endColor.b ** 2, delta))
-  );
-
-  // Convert the red and green components to hexadecimal and pad with zeros if necessary
-  const redHex = red.toString(16).padStart(2, "0");
-  const greenHex = green.toString(16).padStart(2, "0");
-  const blueHex = blue.toString(16).padStart(2, "0");
-
-  // Return the color in hexadecimal format
-  return `#${redHex}${greenHex}${blueHex}`;
-}
-
-function calculateColorNoDim(
-  delta,
-  startColor = new Color(0, 0, 0),
-  endColor = new Color(0, 0, 0)
-) {
-  delta = Math.min(Math.max(0, delta), 1);
-
-  const red = Math.floor(
-    Math.sqrt(lerp(startColor.r ** 2, endColor.r ** 2, delta))
-  );
-  const green = Math.floor(
-    Math.sqrt(lerp(startColor.g ** 2, endColor.g ** 2, delta))
-  );
-  const blue = Math.floor(
-    Math.sqrt(lerp(startColor.b ** 2, endColor.b ** 2, delta))
+    gamma * Math.sqrt(lerp(startColor.b ** 2, endColor.b ** 2, delta))
   );
 
   // Convert the red and green components to hexadecimal and pad with zeros if necessary
@@ -176,7 +154,7 @@ function TaskCard(props) {
               display="inline"
               sx={{
                 color:
-                  calculateColorNoDim(
+                  calculateColor(
                     status >= 50 ? (status - 50) / 50 : status / 50,
                     status >= 50
                       ? new Color(255, 191, 0)
@@ -194,7 +172,7 @@ function TaskCard(props) {
               className={styles.description}
               display="inline"
               sx={{
-                color: calculateColorNoDim(
+                color: calculateColor(
                   priority / 4,
                   new Color(238, 75, 43),
                   new Color(255, 191, 0)
@@ -435,7 +413,10 @@ function TaskDialog(props) {
             color: calculateColor(
               completion >= 50 ? (completion - 50) / 50 : completion / 50,
               completion >= 50 ? new Color(255, 191, 0) : new Color(255, 36, 0),
-              completion >= 50 ? new Color(50, 205, 50) : new Color(255, 191, 0)
+              completion >= 50
+                ? new Color(50, 205, 50)
+                : new Color(255, 191, 0),
+              0.75
             ),
             "& .MuiSlider-track": {
               height: completion === 0 ? 0 : 14,
@@ -491,7 +472,8 @@ function TaskDialog(props) {
             color: calculateColor(
               importance / 4,
               new Color(238, 75, 43),
-              new Color(255, 191, 0)
+              new Color(255, 191, 0),
+              0.75
             ),
             "& .MuiSlider-track": {
               height: importance === 4 ? 0 : 14,
@@ -551,11 +533,14 @@ function TaskDialog(props) {
               color: "#aaaaaa",
             }}
           >
-            Due date: {dueDate.format("MMMM D, YYYY")}
+            Due date:&nbsp;
+            <span style={{ color: calculateDateColor(dueDate, completion) }}>
+              {dueDate.format("MMMM D, YYYY")}
+            </span>
           </Typography>
           <Button
             sx={{
-              color: "#5798f7",
+              color: calculateDateColor(dueDate, completion),
               alignSelf: "flex-end !important",
               textTransform: "none",
               display: "flex",
@@ -593,8 +578,8 @@ function TaskDialog(props) {
                 "& .MuiPickersDay-root": {
                   color: "#aaaaaa",
                   "&.Mui-selected": {
-                    backgroundColor: "#505050",
-                    color: "#aaaaaa",
+                    backgroundColor: "#106699",
+                    color: "#dddddd",
                   },
                   "&:hover": {
                     backgroundColor: "#404040",
@@ -625,6 +610,9 @@ function TaskDialog(props) {
                 },
                 "& .MuiDayCalendar-weekDayLabel": {
                   color: "#808080",
+                },
+                "& .MuiPickersDay-today": {
+                  border: "2px solid #40aadd !important",
                 },
               }}
               views={["day"]}
@@ -750,7 +738,7 @@ export default function Tasks() {
       weightA *= Math.max(Math.abs(4 - a.priority) / 4, 0.05);
       weightB *= Math.max(Math.abs(4 - b.priority) / 4, 0.05);
 
-      // Invert the weight if the task is overdue, so its always larger
+      // Invert the weight if the task is overdue, so it's always larger
       if (weightA < 0) {
         weightA = -1 / weightA;
       }
